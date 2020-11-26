@@ -9,32 +9,35 @@ namespace CodeGenerationTest
     {
         static void Main(string[] args)
         {
-            GenDB();
-            GenService();
-        }
-
-        private static void GenDB()
-        {
-            var dbfile = File.CreateText("ApplicationDbContext.cs");
-            var list = new List<DbGenerationModel>();
-            list.Add(new DbGenerationModel() { ClassName = "DbGenerationModel", DbName = "MyDbs" });
-            list.Add(new DbGenerationModel() { ClassName = "DbGenerationModel", DbName = "MyDbs2" });
-            var dbgeneration = DbGeneration.GenerateDb("CodeGenerationTest", list, "ApplicationDbContext");
-            dbgeneration.WriteTo(dbfile);
-            dbfile.Close();
-            
-            
-        }
-
-        private static void GenService()
-        {
-            var genName = "GeometricVertex";
-            var serviceFile = File.CreateText($"{genName}Service.cs");
-            var dbModel = new DbGenerationModel() { ClassName = "GeometricVertex", DbName = "GeometricVertices" };
+            var applicationDbName = "ApplicationDbContext";
+            var namespace_string = "QChoice_AutoAR_Api";
             var usingList = new List<string>();
             usingList.Add(new string("AutoAROjectModel"));
             usingList.Add(new string("QChoice_AutoAR_Api.Database"));
-            var serviceGeneration = EFCoreServiceGeneration.CreatEFCoreDefaultService("QChoice_AutoAR_Api", dbModel, usingList, genName, "ApplicationDbContext", dbModel.DbName);
+            DatabaseServiceModel databaseService = new DatabaseServiceModel("DbGenerationModel", "MyDbs", usingList);
+            var db_List = new List<DatabaseServiceModel>();
+            db_List.Add(databaseService);
+            GeneratorModel generator = new GeneratorModel(applicationDbName, namespace_string, db_List);
+            GenDB(generator);
+            foreach (var item in db_List)
+            {
+                GenService(generator, item);
+            }
+        }
+
+        private static void GenDB(GeneratorModel generator)
+        {
+            var dbfile = File.CreateText($"{generator.ApplicationDbName}.cs");
+            var dbgeneration = DbGeneration.GenerateDb(generator);
+            dbgeneration.WriteTo(dbfile);
+            dbfile.Close();
+
+        }
+
+        private static void GenService(GeneratorModel generator, DatabaseServiceModel databaseService)
+        {
+            var serviceFile = File.CreateText($"{databaseService.ServiceName}Service.cs");
+            var serviceGeneration = EFCoreServiceGeneration.CreatEFCoreDefaultService(databaseService, generator);
             serviceGeneration.WriteTo(serviceFile);
             serviceFile.Close();
         }

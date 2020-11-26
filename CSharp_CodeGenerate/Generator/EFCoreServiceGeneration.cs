@@ -5,13 +5,23 @@ using System.Linq;
 using Microsoft.CodeAnalysis.CSharp;
 using System.Text;
 using System.Collections.Generic;
+using Pluralize.NET;
+//using Microsoft.EntityFrameworkCore.Design;
 
 namespace CSharp_CodeGenerate
 {
     public static class EFCoreServiceGeneration
     {
-        public static SyntaxNode CreatEFCoreDefaultService(string namespace_string, DbGenerationModel dbModel, List<String> usingStrings, string serviceName, string dataBaseString, string dbName)
+
+        public static SyntaxNode CreatEFCoreDefaultService(DatabaseServiceModel model, GeneratorModel generator)
         {
+            IPluralize pluralizer = new Pluralizer();
+            string namespace_string = generator.NamespaceString;
+
+            List<String> usingStrings = model.ServiceUsingList;
+            string serviceName = model.ClassName;
+
+            string dbName = generator.ApplicationDbName;
 
             var EFCoreString = new StringBuilder();
             if (usingStrings.Count > 0)
@@ -22,7 +32,7 @@ namespace CSharp_CodeGenerate
                 }
             }
             EFCoreString.Append($@"
-using {dataBaseString};
+using {namespace_string}.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -38,15 +48,15 @@ namespace {namespace_string}.Service
             DbContext = dbContext;
         }}
 
-        public async Task<{dbModel.ClassName}> Get{dbModel.ClassName}Async(Guid id)
+        public async Task<{model.ClassName}> Get{model.ClassName}Async(Guid id)
         {{
-            var result = await DbContext.{dbModel.DbName}.AsNoTracking().FirstOrDefaultAsync(b => b.Id == id);
+            var result = await DbContext.{model.DbName}.AsNoTracking().FirstOrDefaultAsync(b => b.Id == id);
             return result;
         }}
 
-        public async Task<List<{dbModel.ClassName}>> Get{dbModel.DbName}Async(string query)
+        public async Task<List<{model.ClassName}>> Get{pluralizer.Pluralize(model.ClassName)}Async(string query)
         {{
-            var result = await DbContext.{dbModel.DbName}.AsNoTracking().ToListAsync();
+            var result = await DbContext.{model.DbName}.AsNoTracking().ToListAsync();
             //if(!String.IsNullOrWhiteSpace(query))
             //{{
             //    var param = query.Split("","");
@@ -54,28 +64,29 @@ namespace {namespace_string}.Service
             //}}
             return result;
         }}
+");
 
-
-        public async Task<int> Update{dbModel.ClassName}Async({dbModel.ClassName} {dbModel.ClassName.ToLower()})
+            EFCoreString.Append($@"
+        public async Task<int> Update{model.ClassName}Async({model.ClassName} {model.ClassName.ToLower()})
         {{
-            var item = await DbContext.{dbModel.DbName}.FirstOrDefaultAsync(b => b.Id == {dbModel.ClassName.ToLower()}.Id);
+            var item = await DbContext.{model.DbName}.FirstOrDefaultAsync(b => b.Id == {model.ClassName.ToLower()}.Id);
             if (item == null)
             {{
-                DbContext.{dbModel.DbName}.Add({dbModel.ClassName.ToLower()});
+                DbContext.{model.DbName}.Add({model.ClassName.ToLower()});
             }}
             else
             {{
-                DbContext.Entry(item).CurrentValues.SetValues({dbModel.ClassName.ToLower()});
+                DbContext.Entry(item).CurrentValues.SetValues({model.ClassName.ToLower()});
             }}
             return await DbContext.SaveChangesAsync();
         }}
 
-        public async Task<int> Delete{dbModel.DbName}Async(params {dbModel.ClassName}[] {dbModel.DbName.ToLower()})
+        public async Task<int> Delete{model.DbName}Async(params {model.ClassName}[] {model.DbName.ToLower()})
         {{
-            var removelist = new List<{dbModel.ClassName}>();
-            foreach (var item in {dbModel.DbName.ToLower()})
+            var removelist = new List<{model.ClassName}>();
+            foreach (var item in {model.DbName.ToLower()})
             {{
-                var Exist = await DbContext.{dbModel.DbName}.FirstOrDefaultAsync(b => b.Id == item.Id);
+                var Exist = await DbContext.{model.DbName}.FirstOrDefaultAsync(b => b.Id == item.Id);
                 if (Exist != null)
                 {{
                     removelist.Add(Exist);
@@ -83,7 +94,7 @@ namespace {namespace_string}.Service
 
 
             }}
-            DbContext.{dbModel.DbName}.RemoveRange(removelist);
+            DbContext.{model.DbName}.RemoveRange(removelist);
             return await DbContext.SaveChangesAsync();
         }}
     }}

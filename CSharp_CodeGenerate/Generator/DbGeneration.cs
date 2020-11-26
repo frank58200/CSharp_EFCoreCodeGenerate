@@ -10,8 +10,11 @@ namespace CSharp_CodeGenerate
 {
     public static class DbGeneration
     {
-        public static SyntaxNode GenerateDb(string namespace_string, List<DbGenerationModel> dbs, string DbContextName)
+        public static SyntaxNode GenerateDb(GeneratorModel generatorModel)
         {
+            string namespace_string = generatorModel.NamespaceString;
+            List<DatabaseServiceModel> dbs = generatorModel.Db_List;
+            string DbContextName = generatorModel.ApplicationDbName;
 
             var DefaultDBContextString = new StringBuilder($@"
 using Microsoft.EntityFrameworkCore;
