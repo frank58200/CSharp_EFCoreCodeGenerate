@@ -10,10 +10,10 @@ namespace CodeGenerationTest
         static void Main(string[] args)
         {
             var applicationDbName = "ApplicationDbContext";
-            var namespace_string = "QChoice_AutoAR_Api";
+            var namespace_string = "WebApi";
             var usingList = new List<string>();
-            usingList.Add(new string("AutoAROjectModel"));
-            usingList.Add(new string("QChoice_AutoAR_Api.Database"));
+            usingList.Add(new string("WebApiModel"));
+            usingList.Add(new string("WebApi.Database"));
             DatabaseServiceModel databaseService = new DatabaseServiceModel("DbGenerationModel", "MyDbs", usingList);
             var db_List = new List<DatabaseServiceModel>();
             db_List.Add(databaseService);
