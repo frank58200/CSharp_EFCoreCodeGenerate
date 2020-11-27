@@ -6,30 +6,34 @@ using System.Threading.Tasks;
 
 namespace CSharp_CodeGenerate
 {
-    public class DatabaseServiceModel: DatabaseModel
+    public class DatabaseServiceModel : DatabaseModel
     {
         public DatabaseServiceModel()
         {
         }
 
-        
 
-        public DatabaseServiceModel(string className, string dbName, List<string> serviceUsingList, List<DatabaseModel> relationDbList= null, string serviceName="") : base(className, dbName)
+
+        public DatabaseServiceModel(string className, string dbName, List<string> serviceUsingList, List<DatabaseModel> relationDbList = null, string serviceName = "", string folderGroupName = "") : base(className, dbName)
         {
             ServiceUsingList = serviceUsingList;
             RelationDbList = relationDbList;
-            if(string.IsNullOrWhiteSpace(serviceName))
+            FolderGroupName = folderGroupName;
+            if (string.IsNullOrWhiteSpace(serviceName))
             {
                 ServiceName = className;
             }
-        }      
+
+        }
 
         public string ServiceName { get; set; }
+
+        public string FolderGroupName { get; set; }
         public List<string> ServiceUsingList { get; set; }
 
         public List<DatabaseModel> RelationDbList { get; set; }
 
-        
+
     }
 
     public class DatabaseModel

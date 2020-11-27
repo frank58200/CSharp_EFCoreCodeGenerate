@@ -1,4 +1,5 @@
 ﻿using CSharp_CodeGenerate;
+using CSharp_CodeGenerate.Generator;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,12 +18,15 @@ namespace CodeGenerationTest
             DatabaseServiceModel databaseService = new DatabaseServiceModel("DbGenerationModel", "MyDbs", usingList);
             var db_List = new List<DatabaseServiceModel>();
             db_List.Add(databaseService);
+
             GeneratorModel generator = new GeneratorModel(applicationDbName, namespace_string, db_List);
-            GenDB(generator);
-            foreach (var item in db_List)
-            {
-                GenService(generator, item);
-            }
+            Generation generation = new Generation();
+            generation.Execute(generator);
+            //GenDB(generator);
+            //foreach (var item in db_List)
+            //{
+            //    GenService(generator, item);
+            //}
         }
 
         private static void GenDB(GeneratorModel generator)
