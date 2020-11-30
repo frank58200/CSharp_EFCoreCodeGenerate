@@ -10,7 +10,7 @@ using Pluralize.NET;
 
 namespace CSharp_CodeGenerate
 {
-    public static class EFCoreServiceGeneration
+    public static class EFCoreServiceInOneGeneration
     {
 
         public static SyntaxNode CreatEFCoreDefaultService(DatabaseServiceModel model, GeneratorModel generator)
@@ -33,7 +33,6 @@ namespace CSharp_CodeGenerate
             }
             EFCoreString.Append($@"
 using {namespace_string}.Database;
-using {namespace_string}.Service.Factory;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -41,14 +40,9 @@ using System.Linq;
 using System.Threading.Tasks;
 namespace {namespace_string}.Service
 {{
-    public class {serviceName}Service:I{serviceName}Service
+    public partial class {generator.UniformServiceName}Service
     {{
-        private readonly {dbName} DbContext = null;
-        public {serviceName}Service({dbName} dbContext)
-        {{
-            DbContext = dbContext;
-        }}
-
+       
         public async Task<{model.ClassName}> Get{serviceName}Async(Guid id)
         {{
             var result = await DbContext.{model.DbName}.AsNoTracking().FirstOrDefaultAsync(b => b.Id == id);
@@ -116,6 +110,48 @@ namespace {namespace_string}.Service
             DbContext.{model.DbName}.RemoveRange(removelist);
             return await DbContext.SaveChangesAsync();
         }}
+    }}
+}}");
+            var newNode = SyntaxFactory.ParseSyntaxTree(EFCoreString.ToString()).GetRoot().NormalizeWhitespace();
+            return newNode;
+        }
+
+        public static SyntaxNode CreatEFCoreCenterService(DatabaseServiceModel model, GeneratorModel generator)
+        {
+            IPluralize pluralizer = new Pluralizer();
+            string namespace_string = generator.NamespaceString;
+
+            List<String> usingStrings = model.ServiceUsingList;
+          
+
+            string dbName = generator.ApplicationDbName;
+
+            var EFCoreString = new StringBuilder();
+            if (usingStrings.Count > 0)
+            {
+                foreach (var usingstring in usingStrings)
+                {
+                    EFCoreString.Append($@"using {usingstring};");
+                }
+            }
+            EFCoreString.Append($@"
+using {namespace_string}.Database;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+namespace {namespace_string}.Service
+{{
+    public partial class {generator.UniformServiceName}Service
+    {{
+        private readonly {dbName} DbContext = null;
+        public {generator.UniformServiceName}Service({dbName} dbContext)
+        {{
+            DbContext = dbContext;
+        }}
+
+    
     }}
 }}");
             var newNode = SyntaxFactory.ParseSyntaxTree(EFCoreString.ToString()).GetRoot().NormalizeWhitespace();

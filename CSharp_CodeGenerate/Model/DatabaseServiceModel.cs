@@ -14,14 +14,26 @@ namespace CSharp_CodeGenerate
 
 
 
-        public DatabaseServiceModel(string className, string dbName, List<string> serviceUsingList, List<DatabaseModel> relationDbList = null, string serviceName = "", string folderGroupName = "") : base(className, dbName)
+        public DatabaseServiceModel(string className, string dbName, List<string> serviceUsingList, List<RelationModel> relationDbList = null, string serviceName = "", string folderGroupName = "") : base(className, dbName)
         {
             ServiceUsingList = serviceUsingList;
-            RelationDbList = relationDbList;
+            if (relationDbList == null)
+            {
+                RelationDbList = new List<RelationModel>();
+            }
+            else
+            {
+
+                RelationDbList = relationDbList;
+            }
             FolderGroupName = folderGroupName;
             if (string.IsNullOrWhiteSpace(serviceName))
             {
                 ServiceName = className;
+            }
+            else
+            {
+                ServiceName = serviceName;
             }
 
         }
@@ -31,7 +43,7 @@ namespace CSharp_CodeGenerate
         public string FolderGroupName { get; set; }
         public List<string> ServiceUsingList { get; set; }
 
-        public List<DatabaseModel> RelationDbList { get; set; }
+        public List<RelationModel> RelationDbList { get; set; }
 
 
     }
@@ -47,8 +59,23 @@ namespace CSharp_CodeGenerate
             ClassName = className;
             DbName = dbName;
         }
-
         public string ClassName { get; set; }
         public string DbName { get; set; }
+    }
+
+    public class RelationModel
+    {
+        public RelationModel()
+        {
+        }
+
+        public RelationModel(string relationItemName, string memberName)
+        {
+            RelationItemName = relationItemName;
+            MemberName = memberName;
+        }
+
+        public string RelationItemName { get; set; }
+        public string MemberName { get; set; }
     }
 }

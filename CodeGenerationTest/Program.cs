@@ -21,7 +21,7 @@ namespace CodeGenerationTest
 
             GeneratorModel generator = new GeneratorModel(applicationDbName, namespace_string, db_List);
             Generation generation = new Generation();
-            generation.Execute(generator);
+            generation.Execute(generator,false);
             //GenDB(generator);
             //foreach (var item in db_List)
             //{
