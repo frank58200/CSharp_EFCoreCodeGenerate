@@ -4,7 +4,7 @@
 Using the Library can generate the DbContext and the service for DI.
 
 ## Creating the ApplicationDbContext and the seperate Serivce
-```chsarp
+```csharp
 
 var applicationDbName = "ApplicationDbContext";
 var namespace_string = "WebApi";
