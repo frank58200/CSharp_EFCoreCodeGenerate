@@ -94,6 +94,12 @@ namespace {namespace_string}.Service
             return await DbContext.SaveChangesAsync();
         }}
 
+        public async Task<int> Add{pluralizer.Pluralize(serviceName)}Async(List<{model.ClassName}> {model.ClassName.ToLower()})
+        {{
+            DbContext.{model.DbName}.AddRange({model.ClassName.ToLower()});
+            return await DbContext.SaveChangesAsync();
+        }}
+
         public async Task<int> Delete{serviceName}Async(params {model.ClassName}[] {model.DbName.ToLower()})
         {{
             var removelist = new List<{model.ClassName}>();

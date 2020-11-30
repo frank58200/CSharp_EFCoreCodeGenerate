@@ -41,13 +41,9 @@ using System.Threading.Tasks;
 namespace {namespace_string}.Service.Factory
 {{
     public interface I{serviceName}Service
-    {{
-        
-        
-        
+    {{ 
 
-        Task<{model.ClassName}> Get{serviceName}Async(Guid id);
-       
+        Task<{model.ClassName}> Get{serviceName}Async(Guid id);       
 
         Task<List<{model.ClassName}>> Get{pluralizer.Pluralize(serviceName)}Async(string query);
        
